@@ -1,0 +1,9 @@
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/cesnakinis.png' WHERE id = '04088027-facd-47c1-acd3-1c73fcca0d81';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/astrus.png' WHERE id = 'ccc2d9c2-97ee-4a98-a417-cab9001fc519';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/teriyaki.png' WHERE id = '82236737-78bb-4e9c-b30d-1ffb1e364b53';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/alyvuogiu-rozmarinu.png' WHERE id = 'b174419f-2d9a-4a17-adef-124c8e8df485';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/kecupas.png' WHERE id = 'ba488d6c-710e-4435-af67-1ceec4bd3661';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/sweet-chilli.png' WHERE id = 'da8799f4-f6fa-48ef-b26f-1385aa73a017';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/pievagrybiu.png' WHERE id = 'd0e3ff00-56d7-46b3-8964-c546cfbbd45c';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/bbq-astrus.png' WHERE id = '794981de-e6f0-4119-85e5-c80a14d5a603';
+UPDATE public.menu_items SET image_url = 'https://ehazxdicxzgdlyztyphm.supabase.co/storage/v1/object/public/menu-images/sauces/bbq.png' WHERE id = '97e64d27-f83f-411b-850c-c5e9cc6422d3';

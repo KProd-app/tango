@@ -1,0 +1,317 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ember: var(--ember);
+  --color-ember-glow: var(--ember-glow);
+  --color-charcoal: var(--charcoal);
+  --font-display: "Bebas Neue", sans-serif;
+  --font-script: "Pacifico", cursive;
+  --font-body: "Inter", sans-serif;
+}
+
+:root {
+  --radius: 0.5rem;
+  /* Tango Pizza - Dark red & black palette */
+  --background: oklch(0.13 0.01 20);
+  --foreground: oklch(0.98 0.005 80);
+  --card: oklch(0.17 0.015 25);
+  --card-foreground: oklch(0.98 0.005 80);
+  --popover: oklch(0.17 0.015 25);
+  --popover-foreground: oklch(0.98 0.005 80);
+  --primary: oklch(0.55 0.22 27);
+  --primary-foreground: oklch(0.98 0.005 80);
+  --secondary: oklch(0.22 0.02 25);
+  --secondary-foreground: oklch(0.98 0.005 80);
+  --muted: oklch(0.22 0.02 25);
+  --muted-foreground: oklch(0.7 0.02 60);
+  --accent: oklch(0.6 0.24 30);
+  --accent-foreground: oklch(0.98 0.005 80);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --border: oklch(0.25 0.02 25);
+  --input: oklch(0.22 0.02 25);
+  --ring: oklch(0.55 0.22 27);
+
+  --ember: oklch(0.58 0.24 28);
+  --ember-glow: oklch(0.68 0.22 35);
+  --charcoal: oklch(0.1 0.005 20);
+
+  --gradient-fire: linear-gradient(135deg, oklch(0.58 0.24 28), oklch(0.68 0.22 35));
+  --gradient-dark: linear-gradient(180deg, oklch(0.13 0.01 20), oklch(0.08 0.005 20));
+  --shadow-ember: 0 20px 60px -15px oklch(0.55 0.22 27 / 0.5);
+  --shadow-glow: 0 0 80px oklch(0.6 0.24 30 / 0.4);
+}
+
+.dark {
+  --background: oklch(0.13 0.01 20);
+  --foreground: oklch(0.98 0.005 80);
+  --card: oklch(0.17 0.015 25);
+  --card-foreground: oklch(0.98 0.005 80);
+  --popover: oklch(0.17 0.015 25);
+  --popover-foreground: oklch(0.98 0.005 80);
+  --primary: oklch(0.55 0.22 27);
+  --primary-foreground: oklch(0.98 0.005 80);
+  --secondary: oklch(0.22 0.02 25);
+  --secondary-foreground: oklch(0.98 0.005 80);
+  --muted: oklch(0.22 0.02 25);
+  --muted-foreground: oklch(0.7 0.02 60);
+  --accent: oklch(0.6 0.24 30);
+  --accent-foreground: oklch(0.98 0.005 80);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --border: oklch(0.25 0.02 25);
+  --input: oklch(0.22 0.02 25);
+  --ring: oklch(0.55 0.22 27);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  html,
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  a,
+  button {
+    transition:
+      color 250ms ease,
+      background-color 250ms ease,
+      border-color 250ms ease,
+      transform 250ms ease,
+      box-shadow 250ms ease,
+      opacity 250ms ease;
+  }
+
+  img {
+    transition: transform 400ms ease, opacity 400ms ease;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.7s ease-out both;
+  }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes steam-1 {
+  0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translateY(-180px) scale(1.4); opacity: 0; }
+}
+
+@keyframes steam-2 {
+  0% { transform: translateY(20px) translateX(0) scale(0.8); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translateY(-200px) translateX(20px) scale(1.5); opacity: 0; }
+}
+
+@keyframes steam-3 {
+  0% { transform: translateY(20px) translateX(0) scale(0.9); opacity: 0; }
+  30% { opacity: 0.7; }
+  100% { transform: translateY(-190px) translateX(-20px) scale(1.4); opacity: 0; }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+
+.animate-steam-1 {
+  animation: steam-1 4s ease-out infinite;
+}
+
+.animate-steam-2 {
+  animation: steam-2 5s ease-out infinite;
+  animation-delay: 0.8s;
+}
+
+.animate-steam-3 {
+  animation: steam-3 4.5s ease-out infinite;
+  animation-delay: 1.6s;
+}
+
+/* ============================================
+   Custom Scrollbar — subtle gray, desktop only,
+   appears on hover (pointer: fine devices)
+   ============================================ */
+
+@media (hover: hover) and (pointer: fine) {
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent oklch(0.13 0.01 20);
+    transition: scrollbar-color 0.25s ease;
+  }
+  *:hover,
+  *:focus-within {
+    scrollbar-color: oklch(0.55 0.22 27 / 0.85) oklch(0.13 0.01 20);
+  }
+
+  /* WebKit (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: oklch(0.13 0.01 20);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 8px;
+    border: 2px solid oklch(0.13 0.01 20);
+    background-clip: padding-box;
+    transition: background-color 0.25s ease;
+  }
+
+  *:hover::-webkit-scrollbar-thumb,
+  *:focus-within::-webkit-scrollbar-thumb {
+    background-color: oklch(0.55 0.22 27 / 0.85);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.6 0.24 30) !important;
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background-color: oklch(0.68 0.22 35) !important;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+/* Mobile / touch devices: hide scrollbar entirely */
+@media not all and (hover: hover) and (pointer: fine) {
+  html,
+  body,
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent !important;
+  }
+}
+
+/* Extra safety: hide on small viewports regardless of pointer detection */
+@media (max-width: 1024px) {
+  html,
+  body,
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent !important;
+  }
+}
+
+/* Hide scrollbar arrows on browsers that show them */
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Utility: completely hide scrollbar (e.g. horizontal category strip) */
+.no-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+.no-scrollbar::-webkit-scrollbar-track,
+.no-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border: 0 !important;
+}
+
