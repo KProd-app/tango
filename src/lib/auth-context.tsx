@@ -19,21 +19,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Set up auth listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_evt, s) => {
       setSession(s);
       if (s?.user) {
-        // Defer the role check to avoid deadlocks
-        setTimeout(() => {
-          checkAdmin(s.user.id);
-        }, 0);
+        try {
+          await checkAdmin(s.user.id);
+        } catch (e) {
+          console.error("Auth listener admin check error:", e);
+        }
       } else {
         setIsAdmin(false);
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
       setSession(s);
-      if (s?.user) checkAdmin(s.user.id);
+      if (s?.user) {
+        try {
+          await checkAdmin(s.user.id);
+        } catch (e) {
+          console.error("Session admin check error:", e);
+        }
+      }
       setLoading(false);
     });
 
