@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivatumoPolitikaRouteImport } from './routes/privatumo-politika'
 import { Route as PristatymoPolitikaRouteImport } from './routes/pristatymo-politika'
 import { Route as NaudojimoSalygosRouteImport } from './routes/naudojimo-salygos'
-import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdmintestRouteImport } from './routes/admintest'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrderStatusIdRouteImport } from './routes/order-status.$id'
@@ -32,9 +32,9 @@ const NaudojimoSalygosRoute = NaudojimoSalygosRouteImport.update({
   path: '/naudojimo-salygos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AdmintestRoute = AdmintestRouteImport.update({
+  id: '/admintest',
+  path: '/admintest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -56,7 +56,7 @@ const OrderStatusIdRoute = OrderStatusIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
+  '/admintest': typeof AdmintestRoute
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
@@ -65,7 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
+  '/admintest': typeof AdmintestRoute
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
@@ -75,7 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
+  '/admintest': typeof AdmintestRoute
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
@@ -86,7 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/auth'
+    | '/admintest'
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
@@ -95,7 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
-    | '/auth'
+    | '/admintest'
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
@@ -104,7 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
-    | '/auth'
+    | '/admintest'
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
@@ -114,7 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  AuthRoute: typeof AuthRoute
+  AdmintestRoute: typeof AdmintestRoute
   NaudojimoSalygosRoute: typeof NaudojimoSalygosRoute
   PristatymoPolitikaRoute: typeof PristatymoPolitikaRoute
   PrivatumoPolitikaRoute: typeof PrivatumoPolitikaRoute
@@ -144,11 +144,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NaudojimoSalygosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/admintest': {
+      id: '/admintest'
+      path: '/admintest'
+      fullPath: '/admintest'
+      preLoaderRoute: typeof AdmintestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -178,7 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  AuthRoute: AuthRoute,
+  AdmintestRoute: AdmintestRoute,
   NaudojimoSalygosRoute: NaudojimoSalygosRoute,
   PristatymoPolitikaRoute: PristatymoPolitikaRoute,
   PrivatumoPolitikaRoute: PrivatumoPolitikaRoute,

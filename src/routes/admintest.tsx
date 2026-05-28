@@ -10,14 +10,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ChefHat, ArrowLeft } from "lucide-react";
 
-// Slaptas raktas — prisijungimas pasiekiamas tik per /auth?key=tango7p9q2x
-const AUTH_ACCESS_KEY = "tango7p9q2x";
-
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/admintest")({
   component: AuthPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    key: typeof search.key === "string" ? search.key : "",
-  }),
   head: () => ({
     meta: [
       { title: "Prisijungimas — Tango Pizza & Grill" },
@@ -28,7 +22,6 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { key } = Route.useSearch();
   const { session, isAdmin, loading, dbError } = useAuth();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -63,20 +56,6 @@ function AuthPage() {
       setDebugStatus("Tikrinama sesija...");
     }
   }, [loading, session, isAdmin, dbError, navigate]);
-
-  if (key !== AUTH_ACCESS_KEY) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="text-center">
-          <h1 className="font-display text-6xl tracking-wider text-muted-foreground">404</h1>
-          <p className="mt-4 text-sm text-muted-foreground">Puslapis nerastas</p>
-          <Link to="/" className="mt-6 inline-block text-sm text-primary hover:underline">
-            Grįžti į pradžią
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();

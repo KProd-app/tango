@@ -99,7 +99,7 @@ function AdminPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/admintest" });
     } else if (!isAdmin) {
       toast.error("Neturite administratoriaus teisių");
       navigate({ to: "/" });
