@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2, MapPin, Search, Store, Truck } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ export function CheckoutDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const navigate = useNavigate();
   const { items, totalPrice, clear, setOpen: setCartOpen } = useCart();
 
   const [method, setMethod] = useState<"delivery" | "pickup">("delivery");
@@ -244,17 +246,18 @@ export function CheckoutDialog({
         items_total: Number(totalPrice.toFixed(2)),
         total: Number(grandTotal.toFixed(2)),
         comment: comment.trim() || null,
+        status: "LAUKIA_PATVIRTINIMO" as any,
       };
 
       const { data, error } = await supabase
         .from("orders")
         .insert(payload)
-        .select("order_number")
+        .select("id, order_number")
         .single();
 
       if (error) throw error;
 
-      toast.success(`Užsakymas #${data.order_number} priimtas! Netrukus susisieksime.`);
+      toast.success(`Užsakymas #${data.order_number} pateiktas! Laukiama patvirtinimo.`);
       clear();
       onOpenChange(false);
       setCartOpen(false);
@@ -267,6 +270,9 @@ export function CheckoutDialog({
       setDoorCode("");
       setComment("");
       setPoint(null);
+ 
+      // Redirect to the waiting page
+      navigate({ to: "/order-status/$id", params: { id: data.id } });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Nepavyko išsiųsti užsakymo";
       toast.error(msg);

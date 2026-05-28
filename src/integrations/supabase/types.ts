@@ -158,6 +158,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           total: number
           updated_at: string
+          delivery_time: number | null
         }
         Insert: {
           address_apartment?: string | null
@@ -183,6 +184,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total: number
           updated_at?: string
+          delivery_time?: number | null
         }
         Update: {
           address_apartment?: string | null
@@ -208,6 +210,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
+          delivery_time?: number | null
         }
         Relationships: []
       }
@@ -284,6 +287,8 @@ export type Database = {
         | "delivering"
         | "completed"
         | "cancelled"
+        | "LAUKIA_PATVIRTINIMO"
+        | "PATVIRTINTAS"
       payment_method: "card_on_site" | "cash"
     }
     CompositeTypes: {
@@ -420,6 +425,8 @@ export const Constants = {
         "delivering",
         "completed",
         "cancelled",
+        "LAUKIA_PATVIRTINIMO",
+        "PATVIRTINTAS",
       ],
       payment_method: ["card_on_site", "cash"],
     },

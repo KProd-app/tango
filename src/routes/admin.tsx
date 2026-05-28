@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { PromoBannerManager } from "@/components/admin/PromoBannerManager";
 import { AccessCodeManager } from "@/components/admin/AccessCodeManager";
+import { OrdersManager } from "@/components/admin/OrdersManager";
 
 import { Sparkles, X } from "lucide-react";
 
@@ -92,6 +93,7 @@ function AdminPage() {
   const [newCatOpen, setNewCatOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [newItemOpen, setNewItemOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"menu" | "orders">("orders");
 
   // Auth gate
   useEffect(() => {
@@ -236,182 +238,218 @@ function AdminPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl space-y-6 px-6 pt-8">
-        <PromoBannerManager />
-        <AccessCodeManager />
-        <MissingImagesManager
-          items={items}
-          categories={categories}
-          onChanged={loadData}
-        />
+      {/* Tabs bar */}
+      <div className="border-b border-border/40 bg-card/20 sticky top-[73px] z-30">
+        <div className="mx-auto flex max-w-7xl gap-6 px-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab("orders")}
+            className={`py-3 text-sm font-semibold uppercase tracking-wider transition-all border-b-2 ${
+              activeTab === "orders"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Užsakymai (Realtime)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("menu")}
+            className={`py-3 text-sm font-semibold uppercase tracking-wider transition-all border-b-2 ${
+              activeTab === "menu"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Meniu valdymas
+          </button>
+        </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-6 px-6 pb-8 lg:grid-cols-[280px_1fr]">
-        {/* Categories sidebar */}
-        <aside className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg tracking-wider">KATEGORIJOS</h2>
-            <Button size="sm" onClick={() => setNewCatOpen(true)}>
-              <Plus className="h-4 w-4" />
-            </Button>
+      {activeTab === "orders" ? (
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <OrdersManager />
+        </div>
+      ) : (
+        <>
+          <div className="mx-auto max-w-7xl space-y-6 px-6 pt-8">
+            <PromoBannerManager />
+            <AccessCodeManager />
+            <MissingImagesManager
+              items={items}
+              categories={categories}
+              onChanged={loadData}
+            />
           </div>
-          <ul className="space-y-1">
-            {categories.map((cat) => (
-              <li key={cat.id}>
-                <div
-                  className={`group flex items-center gap-2 rounded-md border px-2 py-2 transition-all ${
-                    activeCat === cat.id
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-card/60 hover:border-primary/40"
-                  } ${!cat.is_visible ? "opacity-50" : ""}`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setActiveCat(cat.id)}
-                    className="flex flex-1 items-center gap-2 text-left text-sm"
-                  >
-                    <GripVertical className="h-4 w-4 text-muted-foreground/50" />
-                    <span className="flex-1 truncate">{cat.name}</span>
-                    <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
-                      {items.filter((i) => i.category_id === cat.id).length}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleCategoryVisible(cat)}
-                    className="text-muted-foreground hover:text-primary"
-                    title={cat.is_visible ? "Slėpti" : "Rodyti"}
-                  >
-                    {cat.is_visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingCat(cat)}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => deleteCategory(cat)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </aside>
 
-        {/* Items area */}
-        <main>
-          {activeCatObj ? (
-            <>
-              <div className="mb-6 flex items-center justify-between">
-                <div>
-                  <h2 className="font-display text-3xl tracking-wider">
-                    {activeCatObj.name.toUpperCase()}
-                  </h2>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                    {filteredItems.length} patiekalai
-                  </p>
-                </div>
-                <Button onClick={() => setNewItemOpen(true)} disabled={busy}>
+          <div className="mx-auto grid max-w-7xl gap-6 px-6 pb-8 lg:grid-cols-[280px_1fr]">
+            {/* Categories sidebar */}
+            <aside className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-lg tracking-wider">KATEGORIJOS</h2>
+                <Button size="sm" onClick={() => setNewCatOpen(true)}>
                   <Plus className="h-4 w-4" />
-                  Naujas patiekalas
                 </Button>
               </div>
-
-              <div className="grid gap-3">
-                {filteredItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex gap-4 rounded-lg border border-border bg-card p-3 transition-all hover:border-primary/40 ${
-                      !item.is_visible ? "opacity-50" : ""
-                    }`}
-                  >
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-charcoal">
-                      {item.image_url ? (
-                        <>
-                          <img
-                            src={item.image_url}
-                            alt={item.name}
-                            className="h-full w-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => clearItemImage(item)}
-                            title="Ištrinti nuotrauką"
-                            className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive/90 text-white shadow-md transition-colors hover:bg-destructive"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </>
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col">
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-display text-base tracking-wider">{item.name}</h4>
-                        <span className="font-display text-base text-primary">
-                          {item.sizes && item.sizes.length > 1
-                            ? `nuo ${item.sizes[0].price.toFixed(2)} €`
-                            : `${Number(item.price).toFixed(2)} €`}
+              <ul className="space-y-1">
+                {categories.map((cat) => (
+                  <li key={cat.id}>
+                    <div
+                      className={`group flex items-center gap-2 rounded-md border px-2 py-2 transition-all ${
+                        activeCat === cat.id
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-card/60 hover:border-primary/40"
+                      } ${!cat.is_visible ? "opacity-50" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setActiveCat(cat.id)}
+                        className="flex flex-1 items-center gap-2 text-left text-sm"
+                      >
+                        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                        <span className="flex-1 truncate">{cat.name}</span>
+                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                          {items.filter((i) => i.category_id === cat.id).length}
                         </span>
-                      </div>
-                      {item.description && (
-                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                          {item.description}
-                        </p>
-                      )}
-                      <div className="mt-2 flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => toggleItemVisible(item)}
-                          className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-primary"
-                        >
-                          {item.is_visible ? (
-                            <Eye className="h-3.5 w-3.5" />
-                          ) : (
-                            <EyeOff className="h-3.5 w-3.5" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingItem(item)}
-                          className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-primary"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteItem(item)}
-                          className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleCategoryVisible(cat)}
+                        className="text-muted-foreground hover:text-primary"
+                        title={cat.is_visible ? "Slėpti" : "Rodyti"}
+                      >
+                        {cat.is_visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingCat(cat)}
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCategory(cat)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                  </div>
+                  </li>
                 ))}
-                {filteredItems.length === 0 && (
-                  <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-                    Patiekalų dar nėra. Spauskite „Naujas patiekalas".
+              </ul>
+            </aside>
+
+            {/* Items area */}
+            <main>
+              {activeCatObj ? (
+                <>
+                  <div className="mb-6 flex items-center justify-between">
+                    <div>
+                      <h2 className="font-display text-3xl tracking-wider">
+                        {activeCatObj.name.toUpperCase()}
+                      </h2>
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                        {filteredItems.length} patiekalai
+                      </p>
+                    </div>
+                    <Button onClick={() => setNewItemOpen(true)} disabled={busy}>
+                      <Plus className="h-4 w-4" />
+                      Naujas patiekalas
+                    </Button>
                   </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-              Pasirinkite kategoriją iš kairės arba sukurkite naują.
-            </div>
-          )}
-        </main>
-      </div>
+
+                  <div className="grid gap-3">
+                    {filteredItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`flex gap-4 rounded-lg border border-border bg-card p-3 transition-all hover:border-primary/40 ${
+                          !item.is_visible ? "opacity-50" : ""
+                        }`}
+                      >
+                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-charcoal">
+                          {item.image_url ? (
+                            <>
+                              <img
+                                src={item.image_url}
+                                alt={item.name}
+                                className="h-full w-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => clearItemImage(item)}
+                                title="Ištrinti nuotrauką"
+                                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive/90 text-white shadow-md transition-colors hover:bg-destructive"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </>
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-1 flex-col">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-display text-base tracking-wider">{item.name}</h4>
+                            <span className="font-display text-base text-primary">
+                              {item.sizes && item.sizes.length > 1
+                                ? `nuo ${item.sizes[0].price.toFixed(2)} €`
+                                : `${Number(item.price).toFixed(2)} €`}
+                            </span>
+                          </div>
+                          {item.description && (
+                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                              {item.description}
+                            </p>
+                          )}
+                          <div className="mt-2 flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => toggleItemVisible(item)}
+                              className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-primary"
+                            >
+                              {item.is_visible ? (
+                                <Eye className="h-3.5 w-3.5" />
+                              ) : (
+                                <EyeOff className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingItem(item)}
+                              className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-primary"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteItem(item)}
+                              className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredItems.length === 0 && (
+                      <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+                        Patiekalų dar nėra. Spauskite „Naujas patiekalas".
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+                  Pasirinkite kategoriją iš kairės arba sukurkite naują.
+                </div>
+              )}
+            </main>
+          </div>
+        </>
+      )}
 
       {/* Category dialog */}
       <CategoryDialog

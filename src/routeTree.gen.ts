@@ -15,6 +15,7 @@ import { Route as NaudojimoSalygosRouteImport } from './routes/naudojimo-salygos
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrderStatusIdRouteImport } from './routes/order-status.$id'
 
 const PrivatumoPolitikaRoute = PrivatumoPolitikaRouteImport.update({
   id: '/privatumo-politika',
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrderStatusIdRoute = OrderStatusIdRouteImport.update({
+  id: '/order-status/$id',
+  path: '/order-status/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
+  '/order-status/$id': typeof OrderStatusIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
+  '/order-status/$id': typeof OrderStatusIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/naudojimo-salygos': typeof NaudojimoSalygosRoute
   '/pristatymo-politika': typeof PristatymoPolitikaRoute
   '/privatumo-politika': typeof PrivatumoPolitikaRoute
+  '/order-status/$id': typeof OrderStatusIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
+    | '/order-status/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
+    | '/order-status/$id'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/naudojimo-salygos'
     | '/pristatymo-politika'
     | '/privatumo-politika'
+    | '/order-status/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   NaudojimoSalygosRoute: typeof NaudojimoSalygosRoute
   PristatymoPolitikaRoute: typeof PristatymoPolitikaRoute
   PrivatumoPolitikaRoute: typeof PrivatumoPolitikaRoute
+  OrderStatusIdRoute: typeof OrderStatusIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/order-status/$id': {
+      id: '/order-status/$id'
+      path: '/order-status/$id'
+      fullPath: '/order-status/$id'
+      preLoaderRoute: typeof OrderStatusIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   NaudojimoSalygosRoute: NaudojimoSalygosRoute,
   PristatymoPolitikaRoute: PristatymoPolitikaRoute,
   PrivatumoPolitikaRoute: PrivatumoPolitikaRoute,
+  OrderStatusIdRoute: OrderStatusIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
