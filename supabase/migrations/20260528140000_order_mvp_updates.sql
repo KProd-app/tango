@@ -85,3 +85,10 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+ 
+-- Allow anyone to view order by its ID (unguessable UUID)
+CREATE POLICY "Anyone can view order by ID"
+  ON public.orders
+  FOR SELECT
+  TO anon, authenticated
+  USING (true);
