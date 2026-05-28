@@ -29,7 +29,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { key } = Route.useSearch();
-  const { session, isAdmin, loading } = useAuth();
+  const { session, isAdmin, loading, dbError } = useAuth();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [debugStatus, setDebugStatus] = useState("");
@@ -49,20 +49,20 @@ function AuthPage() {
   }, []);
 
   useEffect(() => {
-    console.log("Auth state updated. Loading:", loading, "Session:", !!session, "IsAdmin:", isAdmin);
+    console.log("Auth state updated. Loading:", loading, "Session:", !!session, "IsAdmin:", isAdmin, "DbError:", dbError);
     if (!loading) {
       if (session && isAdmin) {
         setDebugStatus("Turite sesiją ir admin teises. Nukreipiama...");
         navigate({ to: "/admin" });
       } else if (session) {
-        setDebugStatus(`Prisijungta kaip ${session.user.email}, bet neturite administratoriaus teisių duomenų bazėje.`);
+        setDebugStatus(`Prisijungta kaip ${session.user.email}, bet neturite administratoriaus teisių duomenų bazėje.${dbError ? `\n\nDiagnostika: ${dbError}` : ""}`);
       } else {
         setDebugStatus("Sesijos nėra. Įveskite prieigos kodą.");
       }
     } else {
       setDebugStatus("Tikrinama sesija...");
     }
-  }, [loading, session, isAdmin, navigate]);
+  }, [loading, session, isAdmin, dbError, navigate]);
 
   if (key !== AUTH_ACCESS_KEY) {
     return (
