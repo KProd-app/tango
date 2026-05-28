@@ -26,6 +26,7 @@ type Order = {
   address_city: string | null;
   status: string;
   delivery_time: number | null;
+  cancel_reason: string | null;
   total: number;
   items: OrderItem[];
   created_at: string;
@@ -82,6 +83,7 @@ function OrderStatusPage() {
                     ...prev,
                     status: updatedOrder.status,
                     delivery_time: updatedOrder.delivery_time,
+                    cancel_reason: updatedOrder.cancel_reason,
                   }
                 : null
             );
@@ -205,6 +207,14 @@ function OrderStatusPage() {
                     <p className="text-xs text-muted-foreground mt-2">
                       Numatytas laikas: {delivery_time} min.
                     </p>
+                  )}
+                  {status === "cancelled" && order.cancel_reason && (
+                    <div className="mt-3 rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-left">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Atšaukimo priežastis:</p>
+                      <p className="text-xs text-destructive mt-1 font-medium italic break-words">
+                        {order.cancel_reason}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

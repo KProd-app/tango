@@ -136,6 +136,7 @@ type Order = {
   comment: string | null;
   status: OrderStatus;
   delivery_time: number | null;
+  cancel_reason: string | null;
   created_at: string;
 };
  
@@ -180,6 +181,14 @@ function fmtDate(s: string) {
   });
 }
 
+const REJECTION_REASONS = [
+  "Atsiprašome, neturime reikiamų ingredientų šiam patiekalui.",
+  "Atsiprašome, restoranas šiuo metu perpildytas ir nespės laiku paruošti užsakymo.",
+  "Atsiprašome, šiuo metu nedirba pristatymo kurjeris.",
+  "Neteisingi kliento duomenys (telefono numeris ar adresas).",
+  "Kita priežastis..."
+];
+
 export function OrdersManager() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -196,6 +205,11 @@ export function OrdersManager() {
   const [deliveryTimeMinutes, setDeliveryTimeMinutes] = useState<number>(45);
   const [customTime, setCustomTime] = useState<string>("");
   const [confirming, setConfirming] = useState(false);
+
+  // Rejection reason states
+  const [rejectOrder, setRejectOrder] = useState<Order | null>(null);
+  const [selectedReason, setSelectedReason] = useState<string>(REJECTION_REASONS[0]);
+  const [customReason, setCustomReason] = useState<string>("");
 
   async function load() {
     setLoading(true);
@@ -275,6 +289,15 @@ export function OrdersManager() {
   }, [orders, confirmOrder]);
 
   async function updateStatus(id: string, status: OrderStatus) {
+    if (status === "cancelled") {
+      const o = orders.find((ord) => ord.id === id);
+      if (o) {
+        setRejectOrder(o);
+        setSelectedReason(REJECTION_REASONS[0]);
+        setCustomReason("");
+        return;
+      }
+    }
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) toast.error(error.message);
     else toast.success(`Statusas: ${STATUS_LABELS[status].label}`);
@@ -306,23 +329,32 @@ export function OrdersManager() {
     }
   }
  
-  async function handleRejectOrder() {
-    if (!confirmOrder) return;
-    if (!confirm(`Ar tikrai norite atmesti užsakymą #${confirmOrder.order_number}?`)) return;
+  async function handleConfirmRejection() {
+    if (!rejectOrder) return;
     setConfirming(true);
+    const finalReason = selectedReason === "Kita priežastis..." ? customReason.trim() : selectedReason;
+    if (!finalReason) {
+      toast.error("Prašome pasirinkti arba įrašyti atmetimo priežastį");
+      setConfirming(false);
+      return;
+    }
     const { error } = await supabase
       .from("orders")
       .update({
         status: "cancelled",
-      })
-      .eq("id", confirmOrder.id);
+        cancel_reason: finalReason,
+      } as any)
+      .eq("id", rejectOrder.id);
  
     setConfirming(false);
     if (error) {
       toast.error(error.message);
     } else {
-      toast.error(`Užsakymas #${confirmOrder.order_number} atmestas.`);
-      setConfirmOrder(null);
+      toast.error(`Užsakymas #${rejectOrder.order_number} atmestas.`);
+      setRejectOrder(null);
+      if (confirmOrder && confirmOrder.id === rejectOrder.id) {
+        setConfirmOrder(null);
+      }
     }
   }
  
@@ -586,6 +618,12 @@ export function OrdersManager() {
                       </div>
                     )}
 
+                    {o.status === "cancelled" && o.cancel_reason && (
+                      <div className="rounded-md border border-red-500/20 bg-red-500/5 p-2 text-xs text-red-300">
+                        ❌ Atmetimo priežastis: {o.cancel_reason}
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
                       <Select
                         value={o.status}
@@ -822,7 +860,11 @@ export function OrdersManager() {
           <DialogFooter className="gap-2 sm:gap-0 mt-4 border-t border-border pt-4">
             <Button
               variant="ghost"
-              onClick={handleRejectOrder}
+              onClick={() => {
+                setRejectOrder(confirmOrder);
+                setSelectedReason(REJECTION_REASONS[0]);
+                setCustomReason("");
+              }}
               disabled={confirming}
               className="text-muted-foreground hover:bg-destructive hover:text-destructive-foreground mr-auto"
             >
@@ -840,6 +882,80 @@ export function OrdersManager() {
                 </>
               ) : (
                 "Patvirtinti užsakymą"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rejection Reason Dialog */}
+      <Dialog open={!!rejectOrder} onOpenChange={(open) => !open && setRejectOrder(null)}>
+        <DialogContent className="max-w-md bg-card border-red-500/20">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl tracking-wider text-red-400 uppercase">
+              ATMESTI UŽSAKYMĄ #{rejectOrder?.order_number}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Pasirinkite arba įrašykite priežastį. Ji bus matoma klientui.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              {REJECTION_REASONS.map((reason) => (
+                <label
+                  key={reason}
+                  className="flex items-start gap-3 rounded-lg border border-border bg-background/30 p-3 hover:bg-background/70 cursor-pointer transition-colors"
+                >
+                  <input
+                    type="radio"
+                    name="rejection-reason"
+                    checked={selectedReason === reason}
+                    onChange={() => setSelectedReason(reason)}
+                    className="mt-1 accent-primary"
+                  />
+                  <span className="text-sm font-medium text-foreground">{reason}</span>
+                </label>
+              ))}
+            </div>
+
+            {selectedReason === "Kita priežastis..." && (
+              <div className="space-y-2">
+                <Label htmlFor="custom-reason" className="text-xs text-muted-foreground">
+                  Įrašykite savo priežastį lietuviškai:
+                </Label>
+                <Input
+                  id="custom-reason"
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  placeholder="pvz., restoranas užsidaro anksčiau dėl techninių kliūčių"
+                  className="w-full text-sm"
+                  required
+                />
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setRejectOrder(null)}
+              disabled={confirming}
+            >
+              Atšaukti
+            </Button>
+            <Button
+              onClick={handleConfirmRejection}
+              disabled={confirming || (selectedReason === "Kita priežastis..." && !customReason.trim())}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold"
+            >
+              {confirming ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Atmetama...
+                </>
+              ) : (
+                "Patvirtinti atmetimą"
               )}
             </Button>
           </DialogFooter>

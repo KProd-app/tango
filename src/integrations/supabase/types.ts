@@ -159,6 +159,7 @@ export type Database = {
           total: number
           updated_at: string
           delivery_time: number | null
+          cancel_reason: string | null
         }
         Insert: {
           address_apartment?: string | null
@@ -185,6 +186,7 @@ export type Database = {
           total: number
           updated_at?: string
           delivery_time?: number | null
+          cancel_reason?: string | null
         }
         Update: {
           address_apartment?: string | null
@@ -211,6 +213,7 @@ export type Database = {
           total?: number
           updated_at?: string
           delivery_time?: number | null
+          cancel_reason?: string | null
         }
         Relationships: []
       }
