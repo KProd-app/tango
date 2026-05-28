@@ -172,6 +172,7 @@ export function OrdersManager() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [detailOrder, setDetailOrder] = useState<Order | null>(null);
  
   // Sound alarm states
   const [soundEnabled, setSoundEnabled] = useState(false);
