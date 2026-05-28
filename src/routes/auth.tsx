@@ -32,11 +32,35 @@ function AuthPage() {
   const { session, isAdmin, loading } = useAuth();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [debugStatus, setDebugStatus] = useState("");
   const loginFn = useServerFn(loginWithCode);
 
   useEffect(() => {
-    if (!loading && session && isAdmin) {
-      navigate({ to: "/admin" });
+    // Saugi Supabase kliento informacijos diagnostika konsolėje
+    try {
+      const clientUrl = (supabase as any).supabaseUrl || "";
+      const clientKey = (supabase as any).supabaseKey || "";
+      console.log("DEBUG: Supabase Client URL:", JSON.stringify(clientUrl));
+      console.log("DEBUG: Supabase Client Key length:", clientKey.length);
+      console.log("DEBUG: Supabase Client Key has trailing spaces:", /\s/.test(clientKey));
+    } catch (e) {
+      console.error("DEBUG: Error checking client variables:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("Auth state updated. Loading:", loading, "Session:", !!session, "IsAdmin:", isAdmin);
+    if (!loading) {
+      if (session && isAdmin) {
+        setDebugStatus("Turite sesiją ir admin teises. Nukreipiama...");
+        navigate({ to: "/admin" });
+      } else if (session) {
+        setDebugStatus(`Prisijungta kaip ${session.user.email}, bet neturite administratoriaus teisių duomenų bazėje.`);
+      } else {
+        setDebugStatus("Sesijos nėra. Įveskite prieigos kodą.");
+      }
+    } else {
+      setDebugStatus("Tikrinama sesija...");
     }
   }, [loading, session, isAdmin, navigate]);
 
@@ -57,16 +81,36 @@ function AuthPage() {
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
+    setDebugStatus("Jungiamasi... Prašome palaukti.");
     try {
+      setDebugStatus("1/3 Tikrinamas kodas su serverio funkcija...");
       const creds = await loginFn({ data: { code: code.trim() } });
-      const { error } = await supabase.auth.signInWithPassword({
+      
+      setDebugStatus("2/3 Jungiamasi prie Supabase auth...");
+      console.log("Got credentials from server function");
+
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: creds.email,
         password: creds.password,
       });
-      if (error) throw error;
+
+      if (error) {
+        console.error("Supabase signInWithPassword error:", error);
+        throw error;
+      }
+
+      setDebugStatus("3/3 Laukiama vaidmens patvirtinimo...");
+      console.log("Supabase signInWithPassword success. Session:", !!data.session);
+
+      // Palaukiame sekundę, kol suveiks AuthProvider būsena
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
       toast.success("Sėkmingai prisijungta");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Klaida");
+      console.error("Login process exception:", err);
+      const msg = err instanceof Error ? err.message : "Prisijungimo klaida";
+      setDebugStatus(`Klaida: ${msg}`);
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -116,6 +160,12 @@ function AuthPage() {
               {busy ? "Palaukite..." : "Prisijungti"}
             </Button>
           </form>
+
+          {debugStatus && (
+            <div className="mt-4 p-3 rounded bg-muted/50 border border-border/50 text-center text-xs text-muted-foreground font-mono break-all whitespace-pre-wrap">
+              {debugStatus}
+            </div>
+          )}
         </div>
       </div>
     </div>

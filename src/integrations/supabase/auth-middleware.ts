@@ -6,11 +6,20 @@ import type { Database } from './types'
 
 
 
+function cleanEnvVar(val: string | undefined): string {
+  if (!val) return '';
+  return val
+    .replace(/\\r/g, '')
+    .replace(/\\n/g, '')
+    .replace(/[\r\n]/g, '')
+    .trim();
+}
+
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
-    const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
-    const SUPABASE_PUBLISHABLE_KEY = (process.env.SUPABASE_PUBLISHABLE_KEY || '').trim();
+    const SUPABASE_URL = cleanEnvVar(process.env.SUPABASE_URL);
+    const SUPABASE_PUBLISHABLE_KEY = cleanEnvVar(process.env.SUPABASE_PUBLISHABLE_KEY);
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       throw new Response(

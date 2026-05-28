@@ -5,9 +5,18 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+function cleanEnvVar(val: string | undefined): string {
+  if (!val) return '';
+  return val
+    .replace(/\\r/g, '')
+    .replace(/\\n/g, '')
+    .replace(/[\r\n]/g, '')
+    .trim();
+}
+
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
-  const SUPABASE_SERVICE_ROLE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+  const SUPABASE_URL = cleanEnvVar(process.env.SUPABASE_URL);
+  const SUPABASE_SERVICE_ROLE_KEY = cleanEnvVar(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error(
