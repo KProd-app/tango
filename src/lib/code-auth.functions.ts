@@ -27,22 +27,21 @@ export const loginWithCode = createServerFn({ method: "POST" })
       throw new Error("Neteisingas kodas");
     }
 
-    // Ensure only the hidden admin exists.
+    // Find the hidden admin user if they exist
     const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
       page: 1,
       perPage: 200,
     });
     if (listErr) throw new Error(listErr.message);
-
+ 
     let hiddenAdminId: string | null = null;
     for (const u of list.users) {
       if (u.email === HIDDEN_ADMIN_EMAIL) {
         hiddenAdminId = u.id;
-      } else {
-        await supabaseAdmin.auth.admin.deleteUser(u.id);
+        break;
       }
     }
-
+ 
     if (!hiddenAdminId) {
       const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
         email: HIDDEN_ADMIN_EMAIL,
@@ -56,7 +55,8 @@ export const loginWithCode = createServerFn({ method: "POST" })
         password: HIDDEN_ADMIN_PASSWORD,
       });
     }
-
+ 
+    // Clear and insert user roles
     await supabaseAdmin.from("user_roles").delete().eq("user_id", hiddenAdminId);
     const { error: roleErr } = await supabaseAdmin
       .from("user_roles")
