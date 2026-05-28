@@ -41,6 +41,7 @@ import {
 class AudioAlarm {
   private ctx: AudioContext | null = null;
   private intervalId: number | null = null;
+  private clickListener: (() => void) | null = null;
 
   start() {
     if (this.intervalId) return;
@@ -51,12 +52,24 @@ class AudioAlarm {
     this.intervalId = window.setInterval(() => {
       this.beep();
     }, 1500);
+
+    // Auto-resume AudioContext on first user interaction if suspended
+    this.clickListener = () => {
+      if (this.ctx && this.ctx.state === "suspended") {
+        this.ctx.resume().catch((err) => console.error("Error resuming AudioContext:", err));
+      }
+    };
+    window.addEventListener("click", this.clickListener, { once: true });
   }
 
   stop() {
     if (this.intervalId) {
       window.clearInterval(this.intervalId);
       this.intervalId = null;
+    }
+    if (this.clickListener) {
+      window.removeEventListener("click", this.clickListener);
+      this.clickListener = null;
     }
     if (this.ctx) {
       this.ctx.close();
@@ -175,7 +188,7 @@ export function OrdersManager() {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
  
   // Sound alarm states
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [alarmActive, setAlarmActive] = useState(false);
  
   // Tablet confirmation modal states
