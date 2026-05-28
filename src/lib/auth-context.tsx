@@ -18,8 +18,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evt, s) => {
+    let active = true;
+
+    // Fallback timeout to ensure we never lock the UI in loading state forever
+    const timer = setTimeout(() => {
+      if (active) {
+        console.warn("DEBUG: Auth initialization fallback timeout reached. Forcing loading = false");
+        setLoading(false);
+      }
+    }, 4000);
+
+    // Set up auth listener (in Supabase v2, this fires INITIAL_SESSION immediately)
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, s) => {
+      console.log("DEBUG: onAuthStateChange event:", event, "Session:", !!s);
+      if (!active) return;
+
       setSession(s);
       if (s?.user) {
         try {
@@ -30,31 +43,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAdmin(false);
       }
-    });
 
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      setSession(s);
-      if (s?.user) {
-        try {
-          await checkAdmin(s.user.id);
-        } catch (e) {
-          console.error("Session admin check error:", e);
-        }
-      }
       setLoading(false);
+      clearTimeout(timer);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   async function checkAdmin(userId: string) {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+    console.log("DEBUG: Starting checkAdmin for user:", userId);
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (error) {
+        console.error("DEBUG: checkAdmin database error:", error);
+        setIsAdmin(false);
+      } else {
+        console.log("DEBUG: checkAdmin database result:", data);
+        setIsAdmin(!!data);
+      }
+    } catch (err) {
+      console.error("DEBUG: checkAdmin exception:", err);
+      setIsAdmin(false);
+    }
   }
 
   async function signOut() {
